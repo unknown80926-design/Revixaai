@@ -1,0 +1,91 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A user of the application",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["name", "email", "createdAt"]
+    },
+    "Pdf": {
+      "title": "Pdf",
+      "description": "A study material PDF uploaded by a user",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "subject": { "type": "string" },
+        "pages": { "type": "number" },
+        "concepts": { "type": "array", "items": { "type": "string" } },
+        "summary": { "type": "string" },
+        "text": { "type": "string" },
+        "uploadedAt": { "type": "number" },
+        "color": { "type": "string" },
+        "quizIds": { "type": "array", "items": { "type": "string" } },
+        "flashcardIds": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["userId", "name", "subject", "pages", "concepts", "summary", "text", "uploadedAt", "color"]
+    },
+    "QuizAttempt": {
+      "title": "QuizAttempt",
+      "description": "A user's attempt at a quiz",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "pdfId": { "type": "string" },
+        "pdfName": { "type": "string" },
+        "score": { "type": "number" },
+        "totalQ": { "type": "number" },
+        "accuracy": { "type": "number" },
+        "timeTaken": { "type": "number" },
+        "weakConcepts": { "type": "array", "items": { "type": "string" } },
+        "exam": { "type": "string" },
+        "date": { "type": "number" }
+      },
+      "required": ["userId", "pdfId", "pdfName", "score", "totalQ", "accuracy", "timeTaken", "weakConcepts", "exam", "date"]
+    },
+    "FlashcardDeck": {
+      "title": "FlashcardDeck",
+      "description": "A deck of flashcards generated from a PDF",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "pdfId": { "type": "string" },
+        "cards": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "front": { "type": "string" },
+              "back": { "type": "string" }
+            },
+            "required": ["front", "back"]
+          }
+        }
+      },
+      "required": ["userId", "pdfId", "cards"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles"
+    },
+    "/pdfs/{pdfId}": {
+      "schema": { "$ref": "#/entities/Pdf" },
+      "description": "Uploaded PDFs"
+    },
+    "/attempts/{attemptId}": {
+      "schema": { "$ref": "#/entities/QuizAttempt" },
+      "description": "Quiz attempts"
+    },
+    "/flashcards/{flashcardId}": {
+      "schema": { "$ref": "#/entities/FlashcardDeck" },
+      "description": "Flashcard decks"
+    }
+  }
+}

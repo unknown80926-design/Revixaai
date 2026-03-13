@@ -1,0 +1,162 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: {userId}
+    // Fields:
+    //   - name: string (required, < 100 chars)
+    //   - email: string (required, valid email)
+    //   - createdAt: number (required)
+    //
+    // Collection: pdfs
+    // Document ID: {pdfId}
+    // Fields:
+    //   - userId: string (required, matches auth.uid)
+    //   - name: string (required, < 200 chars)
+    //   - subject: string (required, < 100 chars)
+    //   - pages: number (required, > 0)
+    //   - concepts: list of strings (required, size < 50, each < 100 chars)
+    //   - summary: string (required, < 2000 chars)
+    //   - text: string (required, < 1000000 chars)
+    //   - uploadedAt: number (required)
+    //   - color: string (required, < 20 chars)
+    //   - quizIds: list of strings (optional, size < 1000)
+    //   - flashcardIds: list of strings (optional, size < 1000)
+    //
+    // Collection: attempts
+    // Document ID: {attemptId}
+    // Fields:
+    //   - userId: string (required, matches auth.uid)
+    //   - pdfId: string (required)
+    //   - pdfName: string (required, < 200 chars)
+    //   - score: number (required, >= 0)
+    //   - totalQ: number (required, > 0)
+    //   - accuracy: number (required, >= 0, <= 100)
+    //   - timeTaken: number (required, >= 0)
+    //   - weakConcepts: list of strings (required, size < 50, each < 100 chars)
+    //   - exam: string (required, < 100 chars)
+    //   - date: number (required)
+    //
+    // Collection: flashcards
+    // Document ID: {flashcardId}
+    // Fields:
+    //   - userId: string (required, matches auth.uid)
+    //   - pdfId: string (required)
+    //   - cards: list of objects (required, size < 1000)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.userId;
+    }
+    function uidUnchanged() {
+      return !('userId' in request.resource.data) || request.resource.data.userId == request.auth.uid;
+    }
+    function uidNotModified() {
+      return !('userId' in request.resource.data) || request.resource.data.userId == resource.data.userId;
+    }
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+    function validStringLength(field, minLen, maxLen) {
+      return request.resource.data[field] is string && request.resource.data[field].size() >= minLen && request.resource.data[field].size() <= maxLen;
+    }
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+    function isPositive(field) {
+      return request.resource.data[field] is number && request.resource.data[field] >= 0;
+    }
+    function isValidList(listField, maxSize) {
+      return request.resource.data[listField] is list && request.resource.data[listField].size() <= maxSize;
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+    function isValidUser(data) {
+      return hasRequiredFields(['name', 'email', 'createdAt']) &&
+             validStringLength('name', 1, 100) &&
+             isValidEmail(data.email) &&
+             data.createdAt is number;
+    }
+
+    function isValidPdf(data) {
+      return hasRequiredFields(['userId', 'name', 'subject', 'pages', 'concepts', 'summary', 'text', 'uploadedAt', 'color']) &&
+             data.userId == request.auth.uid &&
+             validStringLength('name', 1, 200) &&
+             validStringLength('subject', 1, 100) &&
+             data.pages is number && data.pages > 0 &&
+             isValidList('concepts', 50) &&
+             validStringLength('summary', 0, 2000) &&
+             validStringLength('text', 0, 1000000) &&
+             data.uploadedAt is number &&
+             validStringLength('color', 1, 20);
+    }
+
+    function isValidAttempt(data) {
+      return hasRequiredFields(['userId', 'pdfId', 'pdfName', 'score', 'totalQ', 'accuracy', 'timeTaken', 'weakConcepts', 'exam', 'date']) &&
+             data.userId == request.auth.uid &&
+             data.pdfId is string &&
+             validStringLength('pdfName', 1, 200) &&
+             isPositive('score') &&
+             data.totalQ is number && data.totalQ > 0 &&
+             isPositive('accuracy') && data.accuracy <= 100 &&
+             isPositive('timeTaken') &&
+             isValidList('weakConcepts', 50) &&
+             validStringLength('exam', 1, 100) &&
+             data.date is number;
+    }
+
+    function isValidFlashcardDeck(data) {
+      return hasRequiredFields(['userId', 'pdfId', 'cards']) &&
+             data.userId == request.auth.uid &&
+             data.pdfId is string &&
+             isValidList('cards', 1000);
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data) && request.resource.data.createdAt == resource.data.createdAt;
+      allow delete: if isOwner(userId);
+    }
+
+    match /pdfs/{pdfId} {
+      allow read: if isDocOwner();
+      allow create: if isAuthenticated() && isValidPdf(request.resource.data);
+      allow update: if isDocOwner() && isValidPdf(request.resource.data) && uidNotModified() && request.resource.data.uploadedAt == resource.data.uploadedAt;
+      allow delete: if isDocOwner();
+    }
+
+    match /attempts/{attemptId} {
+      allow read: if isDocOwner();
+      allow create: if isAuthenticated() && isValidAttempt(request.resource.data);
+      allow update: if isDocOwner() && isValidAttempt(request.resource.data) && uidNotModified() && request.resource.data.date == resource.data.date;
+      allow delete: if isDocOwner();
+    }
+
+    match /flashcards/{flashcardId} {
+      allow read: if isDocOwner();
+      allow create: if isAuthenticated() && isValidFlashcardDeck(request.resource.data);
+      allow update: if isDocOwner() && isValidFlashcardDeck(request.resource.data) && uidNotModified();
+      allow delete: if isDocOwner();
+    }
+  }
+}
