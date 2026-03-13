@@ -19,14 +19,16 @@ export const FlashcardPage = ({ user, pdfs, activePdf, showToast }: any) => {
   const doGenerateCards = async (pdf: any) => {
     setGenerating(true);
     try {
-      const cached = await store.getFlashcards(user.id, pdf.id);
+      const cached: any = await store.getFlashcards(user.id, pdf.id);
       if (cached?.cards?.length) { 
         setCards(cached.cards); setIdx(0); setFlip(false); setKnown([]); setLearning([]); setDone(false); setGenerating(false); return; 
       }
 
-      const raw = await generateFlashcards(
-        pdf.text?.slice(0,7000) || pdf.concepts.join(", ")
-      );
+      const fileContent = pdf.fileUri 
+        ? { fileUri: pdf.fileUri, mimeType: pdf.mimeType, name: pdf.name }
+        : (pdf.text?.slice(0, 7000) || pdf.concepts.join(", "));
+
+      const raw = await generateFlashcards(fileContent);
       
       const newCards = raw.cards || [];
       
@@ -55,11 +57,11 @@ export const FlashcardPage = ({ user, pdfs, activePdf, showToast }: any) => {
     <div style={{ flex:1, padding:"32px", animation:"fadeIn 0.3s ease" }}>
       <SectionHead title="Flashcards" sub="AI-generated flashcards from your study material"/>
       {pdfs.length===0 ? (
-        <Card><Empty icon="flash" title="No PDFs yet" sub="Upload a PDF to generate flashcards."/></Card>
+        <Card><Empty icon="flash" title="No files yet" sub="Upload a document to generate flashcards."/></Card>
       ) : (
         <div style={{ maxWidth:540, margin:"0 auto" }}>
           <Card>
-            <h3 style={{ fontFamily:"var(--font-h)", fontWeight:700, fontSize:16, marginBottom:16 }}>Choose a PDF</h3>
+            <h3 style={{ fontFamily:"var(--font-h)", fontWeight:700, fontSize:16, marginBottom:16 }}>Choose a File</h3>
             <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
               {pdfs.map((pdf: any)=>(
                 <div key={pdf.id} onClick={()=>{ setSelectedPdf(pdf); doGenerateCards(pdf); }}
@@ -104,7 +106,7 @@ export const FlashcardPage = ({ user, pdfs, activePdf, showToast }: any) => {
         </div>
         <div style={{ display:"flex", gap:10, justifyContent:"center" }}>
           <Btn variant="primary" icon="refresh" onClick={()=>{ setIdx(0); setFlip(false); setKnown([]); setLearning([]); setDone(false); }}>Review Again</Btn>
-          <Btn variant="secondary" onClick={()=>{ setSelectedPdf(null); setCards([]); }}>Change PDF</Btn>
+          <Btn variant="secondary" onClick={()=>{ setSelectedPdf(null); setCards([]); }}>Change File</Btn>
         </div>
       </Card>
     </div>
@@ -113,15 +115,15 @@ export const FlashcardPage = ({ user, pdfs, activePdf, showToast }: any) => {
   const card = cards[idx];
   return (
     <div style={{ flex:1, padding:"32px", animation:"fadeIn 0.3s ease" }}>
-      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:28 }}>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-7">
         <div>
           <h2 style={{ fontFamily:"var(--font-h)", fontSize:22, fontWeight:700, color:T.text }}>Flashcards</h2>
           <p style={{ color:T.muted, fontSize:13, marginTop:3 }}>{selectedPdf?.name}</p>
         </div>
-        <div style={{ display:"flex", gap:10, alignItems:"center" }}>
+        <div className="flex flex-wrap gap-2 items-center">
           <Badge color={T.success}>✓ {known.length} Known</Badge>
           <Badge color={T.warn}>↺ {learning.length} Learning</Badge>
-          <Btn variant="ghost" size="sm" onClick={()=>{ setSelectedPdf(null); setCards([]); }}>Change PDF</Btn>
+          <Btn variant="ghost" size="sm" onClick={()=>{ setSelectedPdf(null); setCards([]); }}>Change File</Btn>
         </div>
       </div>
 

@@ -26,10 +26,14 @@ export const TutorPage = ({ pdfs, activePdf }: any) => {
     setMsgs(newMsgs);
     setLoading(true);
     try {
+      const fileContent = selectedPdf.fileUri 
+        ? { fileUri: selectedPdf.fileUri, mimeType: selectedPdf.mimeType, name: selectedPdf.name }
+        : (selectedPdf.text?.slice(0, 5000) || "");
+
       const reply = await chatWithTutor(
         selectedPdf.name,
         selectedPdf.concepts,
-        selectedPdf.text?.slice(0,5000) || "",
+        fileContent,
         newMsgs
       );
       setMsgs(m=>[...m, { role:"assistant", text:reply }]);
@@ -51,11 +55,11 @@ export const TutorPage = ({ pdfs, activePdf }: any) => {
     <div style={{ flex:1, padding:"32px", animation:"fadeIn 0.3s ease" }}>
       <SectionHead title="AI Tutor" sub="Ask anything about your study material"/>
       {pdfs.length===0 ? (
-        <Card><Empty icon="bot" title="No PDFs yet" sub="Upload a study PDF first to chat with your AI Tutor."/></Card>
+        <Card><Empty icon="bot" title="No files yet" sub="Upload a study document first to chat with your AI Tutor."/></Card>
       ) : (
         <div style={{ maxWidth:540, margin:"0 auto" }}>
           <Card>
-            <h3 style={{ fontFamily:"var(--font-h)", fontWeight:700, fontSize:16, marginBottom:16 }}>Select a PDF to study</h3>
+            <h3 style={{ fontFamily:"var(--font-h)", fontWeight:700, fontSize:16, marginBottom:16 }}>Select a File to study</h3>
             <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
               {pdfs.map((pdf: any)=>(
                 <div key={pdf.id} onClick={()=>setSelectedPdf(pdf)}
@@ -93,7 +97,7 @@ export const TutorPage = ({ pdfs, activePdf }: any) => {
             </p>
           </div>
         </div>
-        <Btn variant="ghost" size="sm" onClick={()=>{ setSelectedPdf(null); setMsgs([]); }}>Change PDF</Btn>
+        <Btn variant="ghost" size="sm" onClick={()=>{ setSelectedPdf(null); setMsgs([]); }}>Change File</Btn>
       </div>
 
       {/* MESSAGES */}

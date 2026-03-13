@@ -16,61 +16,74 @@ import { store } from './lib/db';
 
 const NAV_ITEMS = [
   { id:"dashboard", icon:"home",     label:"Dashboard" },
-  { id:"library",   icon:"book",     label:"PDF Library" },
+  { id:"library",   icon:"book",     label:"Study Library" },
   { id:"quiz",      icon:"quiz",     label:"Quizzes" },
   { id:"flashcard", icon:"flash",    label:"Flashcards" },
   { id:"analytics", icon:"chart",    label:"Analytics" },
   { id:"tutor",     icon:"bot",      label:"AI Tutor" },
 ];
 
-const Sidebar = ({ active, setPage, user, onLogout, collapsed, setCollapsed }: any) => (
-  <aside style={{ width:collapsed?64:230, flexShrink:0, background:T.white, borderRight:`1px solid ${T.border}`, display:"flex", flexDirection:"column", height:"100vh", position:"sticky", top:0, transition:"width 0.25s ease", overflow:"hidden", zIndex:50 }}>
-    <div style={{ height:64, display:"flex", alignItems:"center", padding:"0 16px", borderBottom:`1px solid ${T.border}`, gap:10, flexShrink:0 }}>
-      <div style={{ width:32, height:32, borderRadius:9, flexShrink:0, background:"var(--grad)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 2px 10px rgba(42,46,127,0.2)", cursor:"pointer" }} onClick={()=>setCollapsed((c: boolean)=>!c)}>
-        <IC n="brain" s={15} c="#fff"/>
-      </div>
-      {!collapsed && <span style={{ fontFamily:"var(--font-h)", fontSize:17, fontWeight:700, color:T.indigo, whiteSpace:"nowrap" }}>Revixa <span style={{ color:T.purple }}>AI</span></span>}
-    </div>
-
-    <nav style={{ flex:1, padding:"12px 10px", overflow:"hidden" }}>
-      {NAV_ITEMS.map(item=>{
-        const isA = active===item.id;
-        return (
-          <button key={item.id} onClick={()=>setPage(item.id)} title={collapsed?item.label:""}
-            style={{ display:"flex", alignItems:"center", gap:11, width:"100%", padding:"9px 11px", borderRadius:8, border:"none", background:isA?`${T.purple}12`:"transparent", color:isA?T.purple:T.muted, cursor:"pointer", fontSize:13, fontWeight:isA?600:400, transition:"all 0.15s", marginBottom:2, whiteSpace:"nowrap", borderLeft:isA?`3px solid ${T.purple}`:"3px solid transparent" }}
-            onMouseEnter={e=>{ if(!isA) e.currentTarget.style.background=T.subtle; }}
-            onMouseLeave={e=>{ if(!isA) e.currentTarget.style.background="transparent"; }}>
-            <IC n={item.icon} s={15} c={isA?T.purple:T.muted} sx={{ flexShrink:0 }}/>
-            {!collapsed && item.label}
-          </button>
-        );
-      })}
-    </nav>
-
-    {!collapsed && (
-      <div style={{ padding:"0 10px 16px" }}>
-        <div style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 12px", borderRadius:10, border:`1px solid ${T.border}` }}>
-          <div style={{ width:32, height:32, borderRadius:"50%", background:"var(--grad)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-            <span style={{ fontFamily:"var(--font-h)", fontSize:13, fontWeight:700, color:"#fff" }}>{user?.name?.[0]?.toUpperCase()||"U"}</span>
-          </div>
-          <div style={{ flex:1, minWidth:0 }}>
-            <p style={{ fontSize:13, fontWeight:600, color:T.text, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{user?.name}</p>
-            <p style={{ fontSize:11, color:T.faint, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{user?.email}</p>
-          </div>
-          <button onClick={onLogout} style={{ background:"none", border:"none", cursor:"pointer", padding:4, flexShrink:0 }} title="Sign out">
-            <IC n="logout" s={14} c={T.faint}/>
-          </button>
-        </div>
-      </div>
+const Sidebar = ({ active, setPage, user, onLogout, collapsed, setCollapsed, mobileOpen, setMobileOpen }: any) => (
+  <>
+    {/* Mobile Overlay */}
+    {mobileOpen && (
+      <div className="md:hidden fixed inset-0 bg-black/20 z-40" onClick={() => setMobileOpen(false)} />
     )}
-  </aside>
+    <aside 
+      className={`fixed md:sticky top-0 h-screen bg-white border-r border-gray-200 flex flex-col transition-all duration-300 z-50
+        ${mobileOpen ? 'translate-x-0 w-[260px]' : '-translate-x-full md:translate-x-0'}
+        ${collapsed ? 'md:w-[72px]' : 'md:w-[260px]'}`}
+    >
+      <div style={{ height:72, display:"flex", alignItems:"center", padding:"0 20px", borderBottom:`1px solid ${T.border}`, gap:12, flexShrink:0 }}>
+        <div style={{ width:36, height:36, borderRadius:10, flexShrink:0, background:"var(--grad)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 2px 10px rgba(79,70,229,0.25)", cursor:"pointer", transition:"transform 0.2s" }} onClick={()=>setCollapsed((c: boolean)=>!c)} onMouseEnter={e=>e.currentTarget.style.transform="scale(1.05)"} onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}>
+          <IC n="brain" s={18} c="#fff"/>
+        </div>
+        {(!collapsed || mobileOpen) && <span style={{ fontFamily:"var(--font-h)", fontSize:19, fontWeight:700, color:T.indigo, whiteSpace:"nowrap", animation:"fadeIn 0.3s" }}>Revixa <span style={{ color:T.purple }}>AI</span></span>}
+      </div>
+
+      <nav style={{ flex:1, padding:"16px 12px", overflow:"hidden", display:"flex", flexDirection:"column", gap:4 }}>
+        {NAV_ITEMS.map(item=>{
+          const isA = active===item.id;
+          return (
+            <button key={item.id} onClick={()=>{ setPage(item.id); setMobileOpen(false); }} title={collapsed&&!mobileOpen?item.label:""}
+              style={{ display:"flex", alignItems:"center", gap:12, width:"100%", padding:"10px 12px", borderRadius:10, border:"none", background:isA?`${T.purple}12`:"transparent", color:isA?T.purple:T.muted, cursor:"pointer", fontSize:14, fontWeight:isA?600:500, transition:"all 0.2s cubic-bezier(0.16, 1, 0.3, 1)", whiteSpace:"nowrap" }}
+              onMouseEnter={e=>{ if(!isA) { e.currentTarget.style.background=T.subtle; e.currentTarget.style.color=T.text; } }}
+              onMouseLeave={e=>{ if(!isA) { e.currentTarget.style.background="transparent"; e.currentTarget.style.color=T.muted; } }}>
+              <IC n={item.icon} s={18} c={isA?T.purple:T.muted} sx={{ flexShrink:0, transition:"all 0.2s" }}/>
+              {(!collapsed || mobileOpen) && item.label}
+            </button>
+          );
+        })}
+      </nav>
+
+      {(!collapsed || mobileOpen) && (
+        <div style={{ padding:"0 16px 20px" }}>
+          <div style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 14px", borderRadius:12, border:`1px solid ${T.border}`, background:T.bg, transition:"all 0.2s" }} onMouseEnter={e=>e.currentTarget.style.borderColor=T.faint} onMouseLeave={e=>e.currentTarget.style.borderColor=T.border}>
+            <div style={{ width:36, height:36, borderRadius:"50%", background:"var(--grad)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, boxShadow:"0 2px 8px rgba(79,70,229,0.2)" }}>
+              <span style={{ fontFamily:"var(--font-h)", fontSize:14, fontWeight:700, color:"#fff" }}>{user?.name?.[0]?.toUpperCase()||"U"}</span>
+            </div>
+            <div style={{ flex:1, minWidth:0 }}>
+              <p style={{ fontSize:14, fontWeight:600, color:T.text, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{user?.name}</p>
+              <p style={{ fontSize:12, color:T.muted, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{user?.email}</p>
+            </div>
+            <button onClick={onLogout} style={{ background:"none", border:"none", cursor:"pointer", padding:6, flexShrink:0, borderRadius:8, transition:"background 0.2s" }} onMouseEnter={e=>e.currentTarget.style.background=T.border} onMouseLeave={e=>e.currentTarget.style.background="none"} title="Sign out">
+              <IC n="logout" s={16} c={T.muted}/>
+            </button>
+          </div>
+        </div>
+      )}
+    </aside>
+  </>
 );
 
-const TopBar = ({ title, sub }: any) => (
-  <div style={{ height:64, display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 32px", background:T.white, borderBottom:`1px solid ${T.border}`, flexShrink:0, position:"sticky", top:0, zIndex:40 }}>
+const TopBar = ({ title, sub, setMobileOpen }: any) => (
+  <div style={{ height:72, display:"flex", alignItems:"center", gap:16, padding:"0 24px", background:"rgba(255,255,255,0.8)", backdropFilter:"blur(12px)", borderBottom:`1px solid ${T.border}`, flexShrink:0, position:"sticky", top:0, zIndex:40 }}>
+    <button className="md:hidden p-2 -ml-2 rounded-lg hover:bg-gray-100 text-gray-600" onClick={() => setMobileOpen(true)}>
+      <IC n="menu" s={20} c={T.text}/>
+    </button>
     <div>
-      <h1 style={{ fontFamily:"var(--font-h)", fontSize:19, fontWeight:700, color:T.text, letterSpacing:"-0.02em" }}>{title}</h1>
-      {sub && <p style={{ fontSize:12, color:T.muted }}>{sub}</p>}
+      <h1 style={{ fontFamily:"var(--font-h)", fontSize:20, fontWeight:700, color:T.text, letterSpacing:"-0.02em" }}>{title}</h1>
+      {sub && <p style={{ fontSize:13, color:T.muted, marginTop:2 }}>{sub}</p>}
     </div>
   </div>
 );
@@ -80,6 +93,7 @@ export default function App() {
   const [user, setUser] = useState<any>(null);
   const [page, setPage] = useState("dashboard");
   const [collapsed, setSidebarCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [pdfs, setPdfs] = useState<any[]>([]);
   const [quizAttempts, setQuizAttempts] = useState<any[]>([]);
   const [activePdf, setActivePdf] = useState<any>(null);
@@ -92,21 +106,28 @@ export default function App() {
 
   useEffect(()=>{
     const unsub = onAuthStateChanged(auth, async (u) => {
-      if (u) {
-        const userData = await store.getUser(u.uid);
-        if (userData) {
-          setUser({ id: u.uid, ...userData });
-          await loadUserData(u.uid);
-          setScreen("app");
+      try {
+        if (u) {
+          const userData = await store.getUser(u.uid);
+          if (userData) {
+            setUser({ id: u.uid, ...userData });
+            await loadUserData(u.uid);
+            setScreen("app");
+          } else {
+            setScreen("auth");
+          }
         } else {
-          // User exists in auth but not in DB (shouldn't happen if AuthPage is used)
-          setScreen("auth");
+          setUser(null);
+          setScreen("landing");
         }
-      } else {
+      } catch (err) {
+        console.error("Auth state error:", err);
         setUser(null);
         setScreen("landing");
+        showToast("Error loading user data", "error");
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
     return unsub;
   }, []);
@@ -138,7 +159,7 @@ export default function App() {
 
   const PAGE_META: any = {
     dashboard: { title:"Dashboard" },
-    library:   { title:"PDF Library" },
+    library:   { title:"Study Library" },
     quiz:      { title:"Quizzes" },
     flashcard: { title:"Flashcards" },
     analytics: { title:"Analytics" },
@@ -169,9 +190,9 @@ export default function App() {
 
       {screen==="app" && user && (
         <div style={{ display:"flex", height:"100vh", overflow:"hidden", background:T.bg }}>
-          <Sidebar active={page} setPage={(p: string)=>{ setPage(p); setActivePdf(null); }} user={user} onLogout={handleLogout} collapsed={collapsed} setCollapsed={setSidebarCollapsed}/>
+          <Sidebar active={page} setPage={(p: string)=>{ setPage(p); setActivePdf(null); }} user={user} onLogout={handleLogout} collapsed={collapsed} setCollapsed={setSidebarCollapsed} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen}/>
           <main style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden", minWidth:0 }}>
-            <TopBar title={PAGE_META[page]?.title||""} />
+            <TopBar title={PAGE_META[page]?.title||""} setMobileOpen={setMobileOpen} />
             <div style={{ flex:1, overflowY:"auto", display:"flex", flexDirection:"column" }}>
               {page==="dashboard"  && <Dashboard user={user} pdfs={pdfs} quizAttempts={quizAttempts} setPage={setPage}/>}
               {page==="library"    && <Library user={user} pdfs={pdfs} setPdfs={setPdfs} setPage={setPage} setActivePdf={setActivePdf} showToast={showToast}/>}

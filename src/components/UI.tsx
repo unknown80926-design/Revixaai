@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { IC } from './Icons';
 
 export const T = {
-  indigo:"#2A2E7F", purple:"#6C63FF", yellow:"#FFC857",
-  bg:"#F8F9FC", white:"#FFFFFF", subtle:"#F1F3F9",
-  text:"#1F2933", muted:"#6B7280", faint:"#9CA3AF",
-  border:"#E5E7EB", success:"#10B981", danger:"#EF4444", warn:"#F59E0B",
-  sh:"0 1px 3px rgba(31,41,51,0.04), 0 4px 16px rgba(31,41,51,0.06)",
-  shHov:"0 4px 20px rgba(108,99,255,0.14), 0 1px 4px rgba(31,41,51,0.06)",
-  shBtn:"0 2px 12px rgba(108,99,255,0.30)",
+  indigo:"#09090B", purple:"#4F46E5", yellow:"#F59E0B",
+  bg:"#FAFAFA", white:"#FFFFFF", subtle:"#F4F4F5",
+  text:"#09090B", muted:"#71717A", faint:"#A1A1AA",
+  border:"#E4E4E7", success:"#10B981", danger:"#EF4444", warn:"#F59E0B",
+  sh:"0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)",
+  shHov:"0 10px 30px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04)",
+  shBtn:"0 2px 8px rgba(79,70,229,0.25)",
 };
 
 export const Card = ({ children, style, onClick, className = "" }: any) => {
@@ -37,8 +37,8 @@ export const Spin = ({ s = 18, c = T.purple }: any) => (
 );
 
 export const Btn = ({ children, onClick, variant = "primary", size = "md", icon, loading, disabled, style, full }: any) => {
-  const pad = { sm:"7px 14px", md:"10px 20px", lg:"13px 30px" }[size as 'sm'|'md'|'lg'];
-  const fs  = { sm:12, md:13, lg:15 }[size as 'sm'|'md'|'lg'];
+  const pad = { sm:"8px 16px", md:"12px 24px", lg:"16px 32px" }[size as 'sm'|'md'|'lg'];
+  const fs  = { sm:13, md:14, lg:16 }[size as 'sm'|'md'|'lg'];
   const vs: any = {
     primary:   { background:"var(--grad)", color:"#fff", border:"none", boxShadow:T.shBtn },
     secondary: { background:T.white, color:T.indigo, border:`1.5px solid ${T.border}`, boxShadow:T.sh },
@@ -53,16 +53,17 @@ export const Btn = ({ children, onClick, variant = "primary", size = "md", icon,
     <button onClick={onClick} disabled={disabled||loading}
       onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
-        display:"inline-flex", alignItems:"center", justifyContent:"center", gap:7,
+        display:"inline-flex", alignItems:"center", justifyContent:"center", gap:8,
         padding:pad, borderRadius:12, fontSize:fs, fontWeight:600,
         cursor: disabled||loading ? "not-allowed" : "pointer",
         opacity: disabled ? 0.5 : 1,
         transition:"all 0.18s ease",
         transform: hov&&!disabled ? "translateY(-1px)" : "translateY(0)",
         width: full ? "100%" : undefined,
+        minHeight: 44, // Ensure minimum touch target size
         ...vs[variant], ...style,
       }}>
-      {loading ? <Spin s={13} c={variant==="primary"||variant==="yellow"?"#fff":T.purple}/> : icon && <IC n={icon} s={13} c={variant==="primary"?"#fff":variant==="yellow"?T.indigo:vs[variant]?.color||"currentColor"}/>}
+      {loading ? <Spin s={14} c={variant==="primary"||variant==="yellow"?"#fff":T.purple}/> : icon && <IC n={icon} s={16} c={variant==="primary"?"#fff":variant==="yellow"?T.indigo:vs[variant]?.color||"currentColor"}/>}
       {children}
     </button>
   );

@@ -95,14 +95,16 @@ service cloud.firestore {
     }
 
     function isValidPdf(data) {
-      return hasRequiredFields(['userId', 'name', 'subject', 'pages', 'concepts', 'summary', 'text', 'uploadedAt', 'color']) &&
+      return hasRequiredFields(['userId', 'name', 'subject', 'pages', 'concepts', 'summary', 'uploadedAt', 'color']) &&
              data.userId == request.auth.uid &&
              validStringLength('name', 1, 200) &&
              validStringLength('subject', 1, 100) &&
              data.pages is number && data.pages > 0 &&
              isValidList('concepts', 50) &&
              validStringLength('summary', 0, 2000) &&
-             validStringLength('text', 0, 1000000) &&
+             (!('text' in data) || validStringLength('text', 0, 1000000)) &&
+             (!('fileUri' in data) || validStringLength('fileUri', 1, 1000)) &&
+             (!('mimeType' in data) || validStringLength('mimeType', 1, 100)) &&
              data.uploadedAt is number &&
              validStringLength('color', 1, 20);
     }

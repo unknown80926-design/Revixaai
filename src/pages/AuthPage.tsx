@@ -32,8 +32,12 @@ export const AuthPage = ({ onAuth }: any) => {
   };
 
   return (
-    <div style={{ minHeight:"100vh", background:"var(--bg)", display:"flex", alignItems:"center", justifyContent:"center", padding:24 }}>
-      <div style={{ width:"100%", maxWidth:420 }}>
+    <div style={{ minHeight:"100vh", background:"var(--bg)", display:"flex", alignItems:"center", justifyContent:"center", padding:24, position:"relative", overflow:"hidden" }}>
+      {/* BACKGROUND EFFECTS */}
+      <div style={{ position:"absolute", inset:0, backgroundSize:"40px 40px", backgroundImage:`linear-gradient(to right, ${T.border} 1px, transparent 1px), linear-gradient(to bottom, ${T.border} 1px, transparent 1px)`, opacity:0.4, zIndex:0, maskImage:"radial-gradient(circle at center, black 0%, transparent 70%)", WebkitMaskImage:"radial-gradient(circle at center, black 0%, transparent 70%)", pointerEvents:"none" }}/>
+      <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%, -50%)", width:600, height:600, background:T.purple, filter:"blur(140px)", opacity:0.1, zIndex:0, borderRadius:"50%", pointerEvents:"none" }}/>
+
+      <div style={{ width:"100%", maxWidth:420, position:"relative", zIndex:10 }}>
         {/* LOGO */}
         <div style={{ textAlign:"center", marginBottom:40 }} className="fu">
           <div style={{ width:52, height:52, borderRadius:16, background:"var(--grad)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 14px", boxShadow:T.shBtn }}>

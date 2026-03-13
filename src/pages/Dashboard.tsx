@@ -18,25 +18,30 @@ export const Dashboard = ({ user, pdfs, quizAttempts, setPage }: any) => {
   const greet = hour<12?"Good morning":hour<17?"Good afternoon":"Good evening";
 
   return (
-    <div style={{ padding:"32px", flex:1, animation:"fadeIn 0.3s ease" }}>
-      <div style={{ marginBottom:32 }}>
-        <h2 style={{ fontFamily:"var(--font-h)", fontSize:24, fontWeight:700, color:T.text }}>{greet}, {user.name.split(" ")[0]} 👋</h2>
-        <p style={{ color:T.muted, marginTop:4, fontSize:14 }}>
-          {pdfs.length === 0 ? "Upload your first PDF to get started." : `${pdfs.length} PDF${pdfs.length>1?"s":""} in your library · ${totalQuizzes} quiz${totalQuizzes!==1?"zes":""} completed.`}
-        </p>
+    <div style={{ flex:1, animation:"fadeIn 0.4s ease", position:"relative" }}>
+      {/* DASHBOARD HEADER */}
+      <div style={{ padding:"40px 32px 32px", background:T.white, borderBottom:`1px solid ${T.border}`, position:"relative", overflow:"hidden" }}>
+        <div style={{ position:"absolute", inset:0, backgroundSize:"30px 30px", backgroundImage:`linear-gradient(to right, ${T.border} 1px, transparent 1px), linear-gradient(to bottom, ${T.border} 1px, transparent 1px)`, opacity:0.3, zIndex:0, maskImage:"linear-gradient(to bottom, black 10%, transparent 100%)", WebkitMaskImage:"linear-gradient(to bottom, black 10%, transparent 100%)", pointerEvents:"none" }}/>
+        <div style={{ position:"relative", zIndex:1 }}>
+          <h2 style={{ fontFamily:"var(--font-h)", fontSize:28, fontWeight:700, color:T.text, letterSpacing:"-0.02em" }}>{greet}, {user.name.split(" ")[0]} 👋</h2>
+          <p style={{ color:T.muted, marginTop:6, fontSize:15 }}>
+            {pdfs.length === 0 ? "Upload your first file to get started." : `${pdfs.length} file${pdfs.length>1?"s":""} in your library · ${totalQuizzes} quiz${totalQuizzes!==1?"zes":""} completed.`}
+          </p>
+        </div>
       </div>
 
-      {pdfs.length === 0 ? (
+      <div style={{ padding:"32px" }}>
+        {pdfs.length === 0 ? (
         <Card>
-          <Empty icon="upload" title="No PDFs yet" sub="Upload your first study material to generate quizzes, flashcards, and more."
-            action={<Btn variant="primary" icon="upload" onClick={()=>setPage("library")}>Upload Your First PDF</Btn>}/>
+          <Empty icon="upload" title="No files yet" sub="Upload your first study material to generate quizzes, flashcards, and more."
+            action={<Btn variant="primary" icon="upload" onClick={()=>setPage("library")}>Upload Your First File</Btn>}/>
         </Card>
       ) : (
         <>
           {/* STATS */}
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(190px,1fr))", gap:16, marginBottom:28 }}>
             {[
-              { label:"Total PDFs", value:String(pdfs.length), icon:"book", color:T.indigo },
+              { label:"Total Files", value:String(pdfs.length), icon:"book", color:T.indigo },
               { label:"Quizzes Taken", value:String(totalQuizzes), icon:"quiz", color:T.purple },
               { label:"Avg Accuracy", value:totalQuizzes?`${avgAccuracy}%`:"—", icon:"trophy", color:T.success },
               { label:"Weak Topics", value:String(weakTopics.length), icon:"zap", color:T.warn },
@@ -55,7 +60,7 @@ export const Dashboard = ({ user, pdfs, quizAttempts, setPage }: any) => {
             ))}
           </div>
 
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20, marginBottom:20 }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
             {/* RECENT ACTIVITY */}
             <Card>
               <SectionHead title="Recent Activity" action={<Btn variant="ghost" size="sm" onClick={()=>setPage("analytics")}>View all</Btn>}/>
@@ -118,6 +123,7 @@ export const Dashboard = ({ user, pdfs, quizAttempts, setPage }: any) => {
           </Card>
         </>
       )}
+      </div>
     </div>
   );
 };

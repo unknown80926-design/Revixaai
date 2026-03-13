@@ -9,15 +9,19 @@ export const Landing = ({ onGetStarted }: any) => {
     { icon:"chart",  title:"Performance Analytics", desc:"Track mastery per topic, surface weak areas, and watch your improvement over time.", color:T.success },
     { icon:"bot",    title:"AI Doubt Tutor", desc:"Ask anything about your uploaded material. Get clear, step-by-step explanations.", color:T.indigo },
     { icon:"brain",  title:"Adaptive Revision", desc:"System detects weak concepts automatically and generates targeted revision sessions.", color:"#E11D48" },
-    { icon:"sparkle",title:"Concept Extraction", desc:"Deep AI parsing creates a structured concept map from every page of your PDF.", color:"#0891B2" },
+    { icon:"sparkle",title:"Concept Extraction", desc:"Deep AI parsing creates a structured concept map from every page of your document.", color:"#0891B2" },
   ];
 
   return (
-    <div style={{ minHeight:"100vh", background:T.bg }}>
+    <div style={{ minHeight:"100vh", background:T.bg, position:"relative", overflow:"hidden" }}>
+      {/* BACKGROUND EFFECTS */}
+      <div style={{ position:"absolute", inset:0, backgroundSize:"40px 40px", backgroundImage:`linear-gradient(to right, ${T.border} 1px, transparent 1px), linear-gradient(to bottom, ${T.border} 1px, transparent 1px)`, opacity:0.4, zIndex:0, maskImage:"linear-gradient(to bottom, black 40%, transparent 100%)", WebkitMaskImage:"linear-gradient(to bottom, black 40%, transparent 100%)", pointerEvents:"none" }}/>
+      <div style={{ position:"absolute", top:-150, left:"50%", transform:"translateX(-50%)", width:800, height:400, background:T.purple, filter:"blur(120px)", opacity:0.15, zIndex:0, borderRadius:"50%", pointerEvents:"none" }}/>
+
       {/* NAV */}
-      <nav style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 6%", height:68, background:"rgba(248,249,252,0.85)", backdropFilter:"blur(12px)", borderBottom:`1px solid ${T.border}`, position:"sticky", top:0, zIndex:100 }}>
+      <nav style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 6%", height:68, background:"rgba(250,250,250,0.7)", backdropFilter:"blur(16px)", borderBottom:`1px solid ${T.border}`, position:"sticky", top:0, zIndex:100 }}>
         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-          <div style={{ width:36, height:36, borderRadius:10, background:"var(--grad)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 2px 12px rgba(42,46,127,0.25)" }}>
+          <div style={{ width:36, height:36, borderRadius:10, background:"var(--grad)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 2px 12px rgba(79,70,229,0.25)" }}>
             <IC n="brain" s={17} c="#fff"/>
           </div>
           <span style={{ fontFamily:"var(--font-h)", fontSize:19, fontWeight:700, color:T.indigo }}>
@@ -30,22 +34,22 @@ export const Landing = ({ onGetStarted }: any) => {
       </nav>
 
       {/* HERO */}
-      <div style={{ padding:"96px 6% 80px", maxWidth:1100, margin:"0 auto", textAlign:"center" }}>
+      <div style={{ position:"relative", zIndex:10, padding:"100px 6% 80px", maxWidth:1100, margin:"0 auto", textAlign:"center" }}>
         <div className="fu"><Badge color={T.purple}>✦ AI-Powered Learning Platform</Badge></div>
         <h1 className="fu" style={{ fontFamily:"var(--font-h)", fontSize:"clamp(40px,6vw,72px)", fontWeight:800, lineHeight:1.08, letterSpacing:"-0.04em", color:T.text, margin:"22px 0 18px", animationDelay:"0.07s" }}>
-          Turn Any PDF Into<br/>
+          Turn Any File Into<br/>
           <span style={{ background:"var(--grad)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>Intelligent Quizzes.</span>
         </h1>
         <p className="fu" style={{ fontSize:"clamp(16px,2vw,18px)", color:T.muted, maxWidth:500, margin:"0 auto 40px", lineHeight:1.75, animationDelay:"0.13s" }}>
           Upload your study material. Revixa AI extracts every concept, generates intelligent quizzes, builds flashcards, and tracks your mastery — in seconds.
         </p>
         <div className="fu" style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap", animationDelay:"0.18s" }}>
-          <Btn variant="primary" size="lg" icon="upload" onClick={onGetStarted}>Upload PDF Free</Btn>
+          <Btn variant="primary" size="lg" icon="upload" onClick={onGetStarted}>Upload File Free</Btn>
         </div>
 
         {/* STATS */}
         <div className="fu" style={{ display:"flex", justifyContent:"center", gap:0, marginTop:72, borderTop:`1px solid ${T.border}`, paddingTop:48, flexWrap:"wrap", animationDelay:"0.22s" }}>
-          {[["PDF→Quiz","In 30 seconds"],["6 AI Tools","In one platform"],["100%","Concept-based"],["Free","To get started"]].map(([v,l],i,arr)=>(
+          {[["File→Quiz","In 30 seconds"],["6 AI Tools","In one platform"],["100%","Concept-based"],["Free","To get started"]].map(([v,l],i,arr)=>(
             <div key={i} style={{ padding:"0 36px", borderRight:i<arr.length-1?`1px solid ${T.border}`:"none", textAlign:"center", minWidth:130 }}>
               <div style={{ fontFamily:"var(--font-h)", fontSize:26, fontWeight:800, color:T.indigo }}>{v}</div>
               <div style={{ fontSize:13, color:T.muted, marginTop:3 }}>{l}</div>
@@ -74,13 +78,16 @@ export const Landing = ({ onGetStarted }: any) => {
       </div>
 
       {/* CTA BAND */}
-      <div style={{ padding:"0 6% 96px", maxWidth:1100, margin:"0 auto" }}>
-        <div style={{ background:"var(--grad)", borderRadius:24, padding:"56px 64px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:32, flexWrap:"wrap", boxShadow:"0 8px 40px rgba(42,46,127,0.25)" }}>
-          <div>
-            <h2 style={{ fontFamily:"var(--font-h)", fontSize:30, fontWeight:800, color:"#fff", letterSpacing:"-0.02em" }}>Ready to study smarter?</h2>
-            <p style={{ color:"rgba(255,255,255,0.7)", marginTop:8, fontSize:15 }}>Free to start. No credit card required.</p>
+      <div style={{ position:"relative", zIndex:10, padding:"0 6% 96px", maxWidth:1100, margin:"0 auto" }}>
+        <div style={{ background:"var(--grad)", borderRadius:32, padding:"64px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:32, flexWrap:"wrap", boxShadow:"0 20px 40px rgba(79,70,229,0.25)", position:"relative", overflow:"hidden" }}>
+          <div style={{ position:"absolute", top:-100, right:-100, width:300, height:300, background:"rgba(255,255,255,0.1)", filter:"blur(60px)", borderRadius:"50%", pointerEvents:"none" }}/>
+          <div style={{ position:"relative", zIndex:1 }}>
+            <h2 style={{ fontFamily:"var(--font-h)", fontSize:36, fontWeight:800, color:"#fff", letterSpacing:"-0.02em" }}>Ready to study smarter?</h2>
+            <p style={{ color:"rgba(255,255,255,0.8)", marginTop:12, fontSize:16 }}>Free to start. No credit card required.</p>
           </div>
-          <Btn variant="yellow" size="lg" icon="arrow" onClick={onGetStarted}>Open Revixa AI</Btn>
+          <div style={{ position:"relative", zIndex:1 }}>
+            <Btn variant="yellow" size="lg" icon="arrow" onClick={onGetStarted}>Open Revixa AI</Btn>
+          </div>
         </div>
       </div>
     </div>

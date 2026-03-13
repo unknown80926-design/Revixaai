@@ -17,7 +17,7 @@ export const AnalyticsPage = ({ quizAttempts, pdfs }: any) => {
   const maxAcc = Math.max(...quizAttempts.map((q: any)=>q.accuracy));
   const minAcc = Math.min(...quizAttempts.map((q: any)=>q.accuracy));
 
-  // Per-PDF mastery
+  // Per-File mastery
   const pdfStats = pdfs.map((pdf: any)=>{
     const attempts = quizAttempts.filter((a: any)=>a.pdfId===pdf.id);
     const mastery = attempts.length ? Math.round(attempts.reduce((a: any,q: any)=>a+q.accuracy,0)/attempts.length) : 0;
@@ -36,7 +36,7 @@ export const AnalyticsPage = ({ quizAttempts, pdfs }: any) => {
     <div style={{ padding:"32px", flex:1, animation:"fadeIn 0.3s ease" }}>
       <div style={{ marginBottom:28 }}>
         <h2 style={{ fontFamily:"var(--font-h)", fontSize:24, fontWeight:700, color:T.text }}>Performance Analytics</h2>
-        <p style={{ color:T.muted, marginTop:4, fontSize:14 }}>Based on {quizAttempts.length} quiz{quizAttempts.length!==1?"zes":""} across {pdfs.length} PDF{pdfs.length!==1?"s":""}.</p>
+        <p style={{ color:T.muted, marginTop:4, fontSize:14 }}>Based on {quizAttempts.length} quiz{quizAttempts.length!==1?"zes":""} across {pdfs.length} file{pdfs.length!==1?"s":""}.</p>
       </div>
 
       {/* KPIs */}
@@ -55,7 +55,7 @@ export const AnalyticsPage = ({ quizAttempts, pdfs }: any) => {
         ))}
       </div>
 
-      <div style={{ display:"grid", gridTemplateColumns:"1.4fr 1fr", gap:20, marginBottom:20 }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-5 mb-5">
         {/* ACCURACY TREND */}
         <Card>
           <SectionHead title="Accuracy Trend" sub={`Last ${chartData.length} quizzes`}/>
@@ -115,10 +115,10 @@ export const AnalyticsPage = ({ quizAttempts, pdfs }: any) => {
         </Card>
       </div>
 
-      {/* PDF MASTERY */}
+      {/* FILE MASTERY */}
       {pdfStats.length>0 && (
         <Card>
-          <SectionHead title="PDF Mastery" sub="Average accuracy per document"/>
+          <SectionHead title="File Mastery" sub="Average accuracy per document"/>
           <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
             {pdfStats.map((p: any,i: number)=>(
               <Bar key={i} value={p.mastery} color={p.mastery>=70?T.success:p.mastery>=50?T.warn:T.danger} label={`${p.name} (${p.attempts} quiz${p.attempts!==1?"zes":""})`} sub={p.mastery}/>
